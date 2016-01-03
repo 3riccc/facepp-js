@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Face++ JavaScript SDK</title>
+    <style>
+      td{
+        border:1px solid lightgreen;
+      }
+      #main{
+        position: absolute;
+        left: 50%;
+        transform:translate(-50%);
+        -webkit-transform:translate(-50%);
+        -moz-transform:translate(-50%);
+        -o-transform:translate(-50%);
+
+      }
+    </style>
+  </head>
+  <body>
+  <div id="main">
+    <pre id="response"></pre>
+    <img src="" alt="图片" id="img">
+    <table id="result">
+      <tr>
+        <td>年龄</td>
+        <td id="age"></td>
+        <td>年龄范围</td>
+        <td id="ageRange"></td>
+      </tr>
+      <tr>
+        <td>性别</td>
+        <td id="gender"></td>
+        <td>可能性</td>
+        <td id="genderRange"></td>
+      </tr>
+      <tr>
+        <td>种族</td>
+        <td id="race"></td>
+        <td>可能性</td>
+        <td id="raceRange"></td>
+      </tr>
+      <tr>
+        <td>微笑程度</td>
+        <td id="smileRange"></td>
+      </tr>
+    </table>
+    <input type="text" id="imgUrl" placeholder="请输入图片网址">
+    <button id="startBtn">识别</button>
+  </div>
+    <script type="text/javascript" src="facepp-sdk.min.js"></script>
+    <script type="text/javascript">
+      (function() {
+        // 初始配置
+        var startBtn = document.getElementById("startBtn");
+        var img = document.getElementById('img');
+        img.style.display="none";
+        var analyzeResult = document.getElementById("result");
+        analyzeResult.style.display="none";
+        // 点击按钮
+        startBtn.onclick = function(){
+          document.getElementById("response").innerHTML="Loading...";
+          // 获取网址
+          var imgUrl = document.getElementById("imgUrl").value;
+          console.log(imgUrl);
+
+          img.setAttribute("src",imgUrl);
+          img.style.display="block";
+
+          var api = new FacePP('a609b8512924eabffaa4d64ab775af54', 'i6SRl_h1cxqGNTDofk0hqlXX0CYFz8ne');
+          api.request('detection/detect', {
+            url: imgUrl
+          }, function(err, result) {
+            if (err) {
+              // TODO handle error
+              return;
+            }
+            console.log(result);
+            document.getElementById("response").style.display="none";
+            analyzeResult.style.display="block";
+            document.getElementById("age").innerHTML = result.face[0].attribute.age.value;
+            document.getElementById("ageRange").innerHTML = result.face[0].attribute.age.range;
+            document.getElementById("gender").innerHTML = result.face[0].attribute.gender.value;
+            document.getElementById("genderRange").innerHTML = result.face[0].attribute.gender.confidence+"%";
+            document.getElementById("race").innerHTML = result.face[0].attribute.race.value;
+            document.getElementById("raceRange").innerHTML = result.face[0].attribute.race.confidence+"%";
+            document.getElementById("smileRange").innerHTML = result.face[0].attribute.smiling.value+"%";
+            // document.getElementById('response').innerHTML = JSON.stringify(result, null, 2);
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>
